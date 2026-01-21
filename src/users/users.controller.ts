@@ -10,8 +10,12 @@ export class UsersController {
 
   // Create new user
   @Post('create')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      return await this.usersService.create(createUserDto);
+    } catch (error) {
+      throw error; // Let NestJS handle the error with proper status code
+    }
   }
 
   // List users

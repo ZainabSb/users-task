@@ -7,8 +7,8 @@ export class CreateUserDto {
   @ApiProperty()
   lastName: string;
 
-  @ApiProperty({ type: String, description: 'Date of birth in YYYY-MM-DD' })
-  dateOfBirth: string;
+  @ApiProperty({ type: String, description: 'Date of birth in YYYY-MM-DD', required: false })
+  dateOfBirth?: string;
 
   @ApiProperty()
   username: string;

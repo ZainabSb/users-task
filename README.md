@@ -23,7 +23,33 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Users Management application with NestJS backend and Angular frontend.
+
+- **Backend**: NestJS (TypeScript) running on port 3000
+- **Frontend**: Angular application running on port 4200
+
+## Frontend Setup
+
+The frontend is an Angular application located in the `frontend/` directory.
+
+1. Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm start
+```
+
+The Angular app will be available at `http://localhost:4200`
+
+See `frontend/README.md` for more details about the Angular frontend.
 
 ## Project setup
 

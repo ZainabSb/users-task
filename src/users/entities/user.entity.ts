@@ -11,8 +11,8 @@ export class User {
   @Column()
   lastName: string;
 
-  @Column({ type: 'date' })
-  dateOfBirth: string;
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth: string | null;
 
   @Column({ unique: true })
   username: string;
