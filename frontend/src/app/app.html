@@ -47,51 +47,41 @@
                     <h2>Create New User</h2>
                     <button class="close-btn" (click)="closeModal()">&times;</button>
                 </div>
-                <form (ngSubmit)="onSubmit()">
+                <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
                     <div class="form-group">
                         <label for="firstName">First Name:</label>
                         <input 
                             type="text" 
                             id="firstName" 
-                            name="firstName" 
-                            [(ngModel)]="firstName"
-                            required>
+                            formControlName="firstName">
                     </div>
                     <div class="form-group">
                         <label for="lastName">Last Name:</label>
                         <input 
                             type="text" 
                             id="lastName" 
-                            name="lastName" 
-                            [(ngModel)]="lastName"
-                            required>
+                            formControlName="lastName">
                     </div>
                     <div class="form-group">
                         <label for="dateOfBirth">Date of Birth:</label>
                         <input 
                             type="date" 
                             id="dateOfBirth" 
-                            name="dateOfBirth" 
-                            [(ngModel)]="dateOfBirth"
-                            required>
+                            formControlName="dateOfBirth">
                     </div>
                     <div class="form-group">
                         <label for="username">Username:</label>
                         <input 
                             type="text" 
                             id="username" 
-                            name="username" 
-                            [(ngModel)]="username"
-                            required>
+                            formControlName="username">
                     </div>
                     <div class="form-group">
                         <label for="password">Password:</label>
                         <input 
                             type="password" 
                             id="password" 
-                            name="password" 
-                            [(ngModel)]="password"
-                            required>
+                            formControlName="password">
                     </div>
                     <div class="form-buttons">
                         <button type="submit" class="btn btn-save">Save</button>
