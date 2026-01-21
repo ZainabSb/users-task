@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Employment } from '../../employment/entities/employment.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class User {
@@ -14,10 +13,6 @@ export class User {
 
   @Column({ type: 'date' })
   dateOfBirth: string;
-
-  @ManyToOne(() => Employment)
-  @JoinColumn({ name: 'employmentTypeId' })
-  employmentType: Employment;
 
   @Column({ unique: true })
   username: string;

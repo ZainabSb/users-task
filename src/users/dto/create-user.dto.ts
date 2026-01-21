@@ -10,9 +10,6 @@ export class CreateUserDto {
   @ApiProperty({ type: String, description: 'Date of birth in YYYY-MM-DD' })
   dateOfBirth: string;
 
-  @ApiProperty({ description: 'Employment type id' })
-  employmentTypeId: number;
-
   @ApiProperty()
   username: string;
 
