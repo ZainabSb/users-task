@@ -1,3 +1,11 @@
+<app-toast [toasts]="toasts"></app-toast>
+
+@if (showFullScreenLoading) {
+    <div class="fullscreen-loading-overlay">
+        <app-loading-spinner></app-loading-spinner>
+    </div>
+}
+
 <div class="container">
     <div class="button-container">
         <button (click)="onShowUsers()" class="btn btn-green">Show Users</button>
@@ -17,9 +25,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (isLoading) {
+                    @if (loading$ | async)  {
                         <tr>
-                            <td colspan="4" style="text-align: center;">Loading users...</td>
+                            <td colspan="4" style="text-align: center; padding: 40px;">
+                                <app-loading-spinner></app-loading-spinner>
+                            </td>
                         </tr>
                     } @else if (users.length === 0) {
                         <tr>
@@ -84,8 +94,10 @@
                             formControlName="password">
                     </div>
                     <div class="form-buttons">
-                        <button type="submit" class="btn btn-save">Save</button>
-                        <button type="button" class="btn btn-cancel" (click)="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-save" [disabled]="loading$ | async">
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-cancel" (click)="closeModal()" [disabled]="loading$ | async">Cancel</button>
                     </div>
                 </form>
             </div>

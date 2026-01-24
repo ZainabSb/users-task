@@ -1,19 +1,33 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { UsersService, User } from './users.service';
+import { Store } from '@ngrx/store';
+import { Observable, Subscription, combineLatest } from 'rxjs';
+import { filter, tap } from 'rxjs/operators';
+import { UsersActions } from './store/users/users.actions';
+import { selectUsers, selectUsersLoading, selectUsersError } from './store/users/users.selectors';
+import { User } from './users.service';
+import { ToastComponent, Toast } from './shared/components/toast/toast.component';
+import { LoadingSpinnerComponent } from './shared/components/loading-spinner/loading-spinner.component';
+import { NotificationService } from './core/services/notification.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ToastComponent, LoadingSpinnerComponent],
   templateUrl: './app.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
-  users: User[] = [];
+export class AppComponent implements OnDestroy {
+  users$!: Observable<User[]>;
+  loading$!: Observable<boolean>;
   showUsersTable = false;
   showModal = false;
-  isLoading = false;
+  users: User[] = [];
+  toasts: Toast[] = [];
+  showFullScreenLoading = false;
+  private subscriptions = new Subscription();
+  private previousUsersLength = 0;
+  private isCreatingUser = false;
 
   userForm = new FormGroup({
     firstName: new FormControl('', [Validators.required]),
@@ -24,31 +38,80 @@ export class AppComponent {
   });
 
   constructor(
-    private usersService: UsersService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private store: Store,
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService
+  ) {
+    try {
+      this.users$ = this.store.select(selectUsers);
+      this.loading$ = this.store.select(selectUsersLoading);
+      
+      this.subscriptions.add(
+        this.users$.subscribe(users => {
+          this.users = users;
+          this.cdr.detectChanges();
+        })
+      );
+
+      this.subscriptions.add(
+        combineLatest([this.users$, this.loading$]).pipe(
+          filter(([users, loading]) => {
+            return this.isCreatingUser && !loading && users.length > this.previousUsersLength;
+          }),
+          tap(() => {
+            this.showFullScreenLoading = false;
+            this.isCreatingUser = false;
+            this.cdr.detectChanges();
+            
+            if (this.showUsersTable) {
+              this.onShowUsers();
+            }
+          })
+        ).subscribe(([users]) => {
+          this.previousUsersLength = users.length;
+        })
+      );
+
+      this.subscriptions.add(
+        combineLatest([this.store.select(selectUsersError), this.loading$]).subscribe(([error, loading]) => {
+          if (error && !loading && this.isCreatingUser && this.showFullScreenLoading) {
+            this.showFullScreenLoading = false;
+            this.isCreatingUser = false;
+            this.cdr.detectChanges();
+          }
+        })
+      );
+
+      this.subscriptions.add(
+        this.users$.subscribe(users => {
+          this.previousUsersLength = users.length;
+        })
+      );
+
+      this.subscriptions.add(
+        this.notificationService.toast$.subscribe(toast => {
+          this.toasts.push(toast);
+          this.cdr.detectChanges();
+          
+          setTimeout(() => {
+            this.toasts = this.toasts.filter(t => t.id !== toast.id);
+            this.cdr.detectChanges();
+          }, 3000);
+        })
+      );
+    } catch (error) {
+      console.error('Error initializing AppComponent:', error);
+    }
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
 
   onShowUsers() {
     this.closeModal();
     this.showUsersTable = true;
-    this.isLoading = true;
-    this.users = [];
-    this.cdr.detectChanges(); 
-
-    this.usersService.getUsers().subscribe({
-      next: (data) => {
-        this.users = Array.isArray(data) ? data : [];
-        this.isLoading = false;
-        this.cdr.detectChanges(); 
-      },
-      error: (error) => {
-        console.error('Error fetching users:', error);
-        this.users = [];
-        this.isLoading = false;
-        this.cdr.detectChanges(); 
-        alert('Error loading users. Make sure the backend server is running on port 3000.');
-      }
-    });
+    this.store.dispatch(UsersActions.loadUsers());
   }
 
   onNewUser() {
@@ -75,7 +138,7 @@ export class AppComponent {
 
   onSubmit() {
     if (this.userForm.invalid) {
-      alert('Please fill in all required fields.');
+      this.notificationService.showError('Please fill in all required fields.');
       return;
     }
 
@@ -89,21 +152,15 @@ export class AppComponent {
     };
 
     if (!formData.dateOfBirth) {
-      alert('Please select a date of birth');
+      this.notificationService.showError('Please select a date of birth');
       return;
     }
 
-    this.usersService.createUser(formData).subscribe({
-      next: () => {
-        alert('User created successfully!');
-        this.closeModal();
-        if (this.showUsersTable) this.onShowUsers();
-      },
-      error: (error) => {
-        console.error('Error creating user:', error);
-        const errorMessage = error.error?.message || error.message || 'Failed to create user';
-        alert('Error creating user: ' + errorMessage);
-      }
-    });
+    this.closeModal();
+    this.isCreatingUser = true;
+    this.showFullScreenLoading = true;
+    this.cdr.detectChanges();
+
+    this.store.dispatch(UsersActions.createUser({ userData: formData }));
   }
 }
