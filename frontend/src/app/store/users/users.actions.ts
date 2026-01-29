@@ -12,5 +12,3 @@ export const UsersActions = createActionGroup({
     'Create User Failure': props<{ error: string }>(),
   }
 });
-
-export type UsersActionsType = typeof UsersActions;
