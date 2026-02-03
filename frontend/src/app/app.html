@@ -1,106 +1,97 @@
 <app-toast [toasts]="toasts"></app-toast>
 
 @if (showFullScreenLoading) {
-    <div class="fullscreen-loading-overlay">
-        <app-loading-spinner></app-loading-spinner>
-    </div>
+<div class="fullscreen-loading-overlay">
+    <app-loading-spinner></app-loading-spinner>
+</div>
 }
 
 <div class="container">
-    <div class="button-container">
-        <button (click)="onShowUsers()" class="btn btn-green">Show Users</button>
-        <button (click)="onNewUser()" class="btn btn-new">NEW</button>
+    <div class="toolbar">
+        <div class="button-container">
+            <p-button label="Show Users" icon="pi pi-users" (onClick)="onShowUsers()" [disabled]="loading$ | async"
+                severity="success" pRipple></p-button>
+            <p-button label="New" icon="pi pi-plus" (onClick)="onNewUser()" [disabled]="loading$ | async"
+                severity="primary" pRipple></p-button>
+        </div>
+        <div class="toolbar-right">
+            <div class="theme-color">
+                <label class="theme-toggle-label">Primary color</label>
+                <p-colorPicker [(ngModel)]="primaryColor" format="hex" (ngModelChange)="onPrimaryColorChange($event)"
+                    inputId="primaryColorPicker" [inline]="false" styleClass="color-picker-btn"></p-colorPicker>
+            </div>
+            <div class="theme-toggle">
+                <label for="darkModeSwitch" class="theme-toggle-label">Dark mode</label>
+                <p-toggleswitch inputId="darkModeSwitch" [(ngModel)]="darkMode"
+                    (ngModelChange)="applyDarkMode($event)" ariaLabel="Toggle dark mode"></p-toggleswitch>
+            </div>
+        </div>
     </div>
 
     @if (showUsersTable) {
-        <div class="table-container">
+    <div class="table-container">
+        <div class="table-header">
             <h2>Users List</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Date of Birth</th>
-                        <th>Username</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (loading$ | async)  {
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 40px;">
-                                <app-loading-spinner></app-loading-spinner>
-                            </td>
-                        </tr>
-                    } @else if (users.length === 0) {
-                        <tr>
-                            <td colspan="4" style="text-align: center;">No users found</td>
-                        </tr>
-                    } @else {
-                        @for (user of users; track $index) {
-                            <tr>
-                                <td>{{ user.firstName || '' }}</td>
-                                <td>{{ user.lastName || '' }}</td>
-                                <td>{{ user.dateOfBirth || '' }}</td>
-                                <td>{{ user.username || '' }}</td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+            <p-selectbutton [options]="tableSizes" [(ngModel)]="selectedTableSize" [multiple]="false"
+                optionLabel="name" optionValue="value" ariaLabel="Table size" />
         </div>
+        <p-table [value]="users" [loading]="loading$ | async" [tableStyle]="{ 'min-width': '50rem' }"
+            [size]="selectedTableSize === 'normal' ? undefined : selectedTableSize">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Date of Birth</th>
+                    <th>Username</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-user>
+                <tr>
+                    <td>{{ user.firstName || '' }}</td>
+                    <td>{{ user.lastName || '' }}</td>
+                    <td>{{ user.dateOfBirth || '' }}</td>
+                    <td>{{ user.username || '' }}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center">No users found</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
     }
 
-    @if (showModal) {
-        <div class="modal-overlay" (click)="onModalOverlayClick($event)">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Create New User</h2>
-                    <button class="close-btn" (click)="closeModal()">&times;</button>
-                </div>
-                <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-                    <div class="form-group">
-                        <label for="firstName">First Name:</label>
-                        <input 
-                            type="text" 
-                            id="firstName" 
-                            formControlName="firstName">
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Last Name:</label>
-                        <input 
-                            type="text" 
-                            id="lastName" 
-                            formControlName="lastName">
-                    </div>
-                    <div class="form-group">
-                        <label for="dateOfBirth">Date of Birth:</label>
-                        <input 
-                            type="date" 
-                            id="dateOfBirth" 
-                            formControlName="dateOfBirth">
-                    </div>
-                    <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            formControlName="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password:</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            formControlName="password">
-                    </div>
-                    <div class="form-buttons">
-                        <button type="submit" class="btn btn-save" [disabled]="loading$ | async">
-                            Save
-                        </button>
-                        <button type="button" class="btn btn-cancel" (click)="closeModal()" [disabled]="loading$ | async">Cancel</button>
-                    </div>
-                </form>
+    <p-dialog [(visible)]="showModal" header="Create New User" [modal]="true" [closable]="true"
+        [dismissableMask]="true" (visibleChange)="onDialogVisibleChange($event)" [style]="{ width: '28rem' }"
+        [contentStyle]="{ overflow: 'visible' }">
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+            <div class="form-field">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" pInputText formControlName="firstName" class="w-full" />
             </div>
-        </div>
-    }
+            <div class="form-field">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" pInputText formControlName="lastName" class="w-full" />
+            </div>
+            <div class="form-field">
+                <label for="dateOfBirth">Date of Birth</label>
+                <p-datePicker formControlName="dateOfBirth" inputId="dateOfBirth" dateFormat="yy-mm-dd"
+                    [showIcon]="true" styleClass="w-full"></p-datePicker>
+            </div>
+            <div class="form-field">
+                <label for="username">Username</label>
+                <input type="text" id="username" pInputText formControlName="username" class="w-full" />
+            </div>
+            <div class="form-field">
+                <label for="password">Password</label>
+                <p-password formControlName="password" inputId="password" [feedback]="false"
+                    styleClass="w-full" inputStyleClass="w-full"></p-password>
+            </div>
+            <div class="form-buttons">
+                <p-button type="submit" label="Submit" [disabled]="loading$ | async" severity="primary"
+                    pRipple></p-button>
+            </div>
+        </form>
+    </p-dialog>
 </div>

@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+  font-family: var(--p-font-family);
+  background-color: var(--p-surface-ground);
+  color: var(--p-text-color);
+}
+
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+  background-color: var(--p-primary-color) !important;
+}
+.p-toggleswitch.p-toggleswitch-checked:hover .p-toggleswitch-slider {
+  background-color: var(--p-primary-hover-color) !important;
+}
+
+.p-button-success {
+  background-color: var(--p-green-500) !important;
+  border-color: var(--p-green-500) !important;
+}
+.p-button-success:not(:disabled):hover {
+  background-color: var(--p-green-hover-color, var(--p-green-400)) !important;
+  border-color: var(--p-green-hover-color, var(--p-green-400)) !important;
+}
+.p-button-success:not(:disabled):active {
+  background-color: var(--p-green-700) !important;
+  border-color: var(--p-green-700) !important;
+}

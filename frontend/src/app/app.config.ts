@@ -5,6 +5,8 @@ import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { usersFeature } from './store/users/users.reducer';
 import { UsersEffects } from './store/users/users.effects';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,6 +18,14 @@ export const appConfig: ApplicationConfig = {
       maxAge: 25,
       logOnly: false,
       autoPause: true,
+    }),
+    providePrimeNG({
+      theme: {
+        preset: Aura,
+        options: {
+          darkModeSelector: '.app-dark'
+        }
+      }
     })
   ]
 };
