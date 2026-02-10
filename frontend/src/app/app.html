@@ -10,20 +10,23 @@
     <div class="toolbar">
         <div class="button-container">
             <p-button label="Show Users" icon="pi pi-users" (onClick)="onShowUsers()" [disabled]="loading$ | async"
-                severity="success" pRipple></p-button>
+                severity="primary" pRipple></p-button>
+
             <p-button label="New" icon="pi pi-plus" (onClick)="onNewUser()" [disabled]="loading$ | async"
                 severity="primary" pRipple></p-button>
         </div>
+
         <div class="toolbar-right">
             <div class="theme-color">
                 <label class="theme-toggle-label">Primary color</label>
                 <p-colorPicker [(ngModel)]="primaryColor" format="hex" (ngModelChange)="onPrimaryColorChange($event)"
                     inputId="primaryColorPicker" [inline]="false" styleClass="color-picker-btn"></p-colorPicker>
             </div>
+
             <div class="theme-toggle">
                 <label for="darkModeSwitch" class="theme-toggle-label">Dark mode</label>
-                <p-toggleswitch inputId="darkModeSwitch" [(ngModel)]="darkMode"
-                    (ngModelChange)="applyDarkMode($event)" ariaLabel="Toggle dark mode"></p-toggleswitch>
+                <p-toggleswitch inputId="darkModeSwitch" [(ngModel)]="darkMode" (ngModelChange)="applyDarkMode($event)"
+                    ariaLabel="Toggle dark mode"></p-toggleswitch>
             </div>
         </div>
     </div>
@@ -32,11 +35,13 @@
     <div class="table-container">
         <div class="table-header">
             <h2>Users List</h2>
-            <p-selectbutton [options]="tableSizes" [(ngModel)]="selectedTableSize" [multiple]="false"
-                optionLabel="name" optionValue="value" ariaLabel="Table size" />
+            <p-selectbutton [options]="tableSizes" [(ngModel)]="selectedTableSize" [multiple]="false" optionLabel="name"
+                optionValue="value" ariaLabel="Table size" />
         </div>
-        <p-table [value]="users" [loading]="loading$ | async" [tableStyle]="{ 'min-width': '50rem' }"
+
+        <p-table [value]="(users$ | async) ?? []" [tableStyle]="{ 'min-width': '50rem' }"
             [size]="selectedTableSize === 'normal' ? undefined : selectedTableSize">
+
             <ng-template pTemplate="header">
                 <tr>
                     <th>First Name</th>
@@ -45,6 +50,7 @@
                     <th>Username</th>
                 </tr>
             </ng-template>
+
             <ng-template pTemplate="body" let-user>
                 <tr>
                     <td>{{ user.firstName || '' }}</td>
@@ -53,6 +59,7 @@
                     <td>{{ user.username || '' }}</td>
                 </tr>
             </ng-template>
+
             <ng-template pTemplate="emptymessage">
                 <tr>
                     <td colspan="4" class="text-center">No users found</td>
@@ -62,36 +69,57 @@
     </div>
     }
 
-    <p-dialog [(visible)]="showModal" header="Create New User" [modal]="true" [closable]="true"
-        [dismissableMask]="true" (visibleChange)="onDialogVisibleChange($event)" [style]="{ width: '28rem' }"
+    <p-dialog [(visible)]="showModal" header="Create New User" [modal]="true" [closable]="true" [dismissableMask]="true"
+        (visibleChange)="onDialogVisibleChange($event)" [style]="{ width: '28rem' }"
         [contentStyle]="{ overflow: 'visible' }">
         <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
             <div class="form-field">
                 <label for="firstName">First Name</label>
-                <input type="text" id="firstName" pInputText formControlName="firstName" class="w-full" />
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-id-card" />
+                    <input type="text" id="firstName" pInputText formControlName="firstName" class="w-full" />
+                </p-iconfield>
             </div>
+
             <div class="form-field">
                 <label for="lastName">Last Name</label>
-                <input type="text" id="lastName" pInputText formControlName="lastName" class="w-full" />
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-user" />
+                    <input type="text" id="lastName" pInputText formControlName="lastName" class="w-full" />
+                </p-iconfield>
             </div>
+
             <div class="form-field">
                 <label for="dateOfBirth">Date of Birth</label>
-                <p-datePicker formControlName="dateOfBirth" inputId="dateOfBirth" dateFormat="yy-mm-dd"
-                    [showIcon]="true" styleClass="w-full"></p-datePicker>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-calendar" />
+                    <p-datePicker formControlName="dateOfBirth" inputId="dateOfBirth" dateFormat="yy-mm-dd"
+                        [showIcon]="false" styleClass="w-full"></p-datePicker>
+                </p-iconfield>
             </div>
+
             <div class="form-field">
                 <label for="username">Username</label>
-                <input type="text" id="username" pInputText formControlName="username" class="w-full" />
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-at" />
+                    <input type="text" id="username" pInputText formControlName="username" class="w-full" />
+                </p-iconfield>
             </div>
+
             <div class="form-field">
                 <label for="password">Password</label>
-                <p-password formControlName="password" inputId="password" [feedback]="false"
-                    styleClass="w-full" inputStyleClass="w-full"></p-password>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-lock" />
+                    <p-password formControlName="password" inputId="password" [feedback]="false" styleClass="w-full"
+                        inputStyleClass="w-full"></p-password>
+                </p-iconfield>
             </div>
+
             <div class="form-buttons">
                 <p-button type="submit" label="Submit" [disabled]="loading$ | async" severity="primary"
                     pRipple></p-button>
             </div>
         </form>
+
     </p-dialog>
 </div>

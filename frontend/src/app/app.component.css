@@ -1,10 +1,7 @@
 :host {
   display: block;
   padding: 20px;
-  margin: 0;
   min-height: 100vh;
-  background-color: var(--p-surface-ground);
-  color: var(--p-text-color);
 }
 
 .container {
@@ -46,12 +43,6 @@
   margin: 0;
 }
 
-.color-picker-btn :deep(.p-colorpicker-preview) {
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--p-border-radius-md, 6px);
-}
-
 .table-container {
   margin-top: 1.5rem;
 }
@@ -85,7 +76,6 @@
   backdrop-filter: blur(4px);
 }
 
-/* Dialog form layout – Aura styles the inputs */
 .form-field {
   margin-bottom: 1.25rem;
 }
@@ -102,7 +92,6 @@
 
 .form-buttons {
   display: flex;
-  gap: 0.5rem;
   justify-content: flex-end;
   margin-top: 1.5rem;
   padding-top: 1rem;
